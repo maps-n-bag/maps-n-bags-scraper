@@ -6,6 +6,9 @@ from webdriver import WebDriver
 class DistanceDriver(WebDriver):
   
   def getDistance(self, place1, place2):
+    self.setLangEnglish()
+    
+    time.sleep(2)
     distanceButton = self.driver.find_element(By.XPATH, '//*[@id="hArJGc"]')
     distanceButton.click()
     time.sleep(2)
@@ -18,10 +21,12 @@ class DistanceDriver(WebDriver):
     submitButton = self.driver.find_element(By.XPATH, '//*[@id="directions-searchbox-1"]/button[1]')
     submitButton.click()
     time.sleep(5)
+    
     self.estimatedTime = self.driver.find_element(By.XPATH, '//*[@id="section-directions-trip-0"]/div[1]/div/div[1]/div[1]').text
     self.estimatedDistance = self.driver.find_element(By.XPATH, '//*[@id="section-directions-trip-0"]/div[1]/div/div[1]/div[2]/div').text
     print("Estimated time: " + self.estimatedTime)
     print("Estimated distance: " + self.estimatedDistance)
+    return self.estimatedTime, self.estimatedDistance
 		
 place1 = 'inani beach'
 place2 = 'kolatoli beach'
