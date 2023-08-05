@@ -87,7 +87,7 @@ class SearchDriver(WebDriver):
 
 
 	def scrape(self, location):
-		# self.setLangEnglish()
+		self.setLangEnglish()
 		self.goToMaps()
 		self.search_location(location)
 		self.get_basic_info()

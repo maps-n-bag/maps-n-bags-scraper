@@ -19,7 +19,7 @@ class WebDriver:
     self.driver = webdriver.Chrome(service=self.service, options=self.options)
     
   def goToMaps(self):
-    self.driver.get("https://www.google.com/maps/")
+    self.driver.get("https://www.google.com/maps")
     
   def setLangEnglish(self):
     self.goToMaps()
