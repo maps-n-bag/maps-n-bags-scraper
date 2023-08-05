@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 import time
 
 from webdriver import WebDriver
+from plus_code_conv import getLatLongFromShortPlusCode
 
 class SearchDriver(WebDriver):
 
@@ -24,8 +25,7 @@ class SearchDriver(WebDriver):
 		self.location_data["website"] = "NA"
 		# self.location_data["Time"] = {"Monday":"NA", "Tuesday":"NA", "Wednesday":"NA", "Thursday":"NA", "Friday":"NA", "Saturday":"NA", "Sunday":"NA"}
 		# self.location_data["Reviews"] = []
-		# self.location_data["Popular Times"] = {"Monday":[], "Tuesday":[], "Wednesday":[], "Thursday":[], "Friday":[], "Saturday":[], "Sunday":[]}
-
+		# self.location_data["Popular Times"] = {"Monday":[], "Tuesday":[], "Wednesday":[], "Thursday":[], "Friday":[], "Saturday":[], "Sunday":[]}     
 		
 	def search_location(self, location):
 		self.location_data["name"] = location
@@ -72,7 +72,18 @@ class SearchDriver(WebDriver):
 		except:
 			print("Error in getting website for", self.location_data["name"])
    
-		# time.sleep(20)
+	def get_location(self):
+		try:
+			xpath = '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[7]/div[7]/button/div/div[2]/div[1]'
+			# WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
+			plusCode = self.driver.find_element(By.XPATH, xpath)
+			print(plusCode.text)
+			lat, long = getLatLongFromShortPlusCode(plusCode.text)
+			self.location_data["lat"] = lat
+			self.location_data["long"] = long
+		except:
+			print("Error in getting plus code for", self.location_data["name"])
+			return
 
 
 	def scrape(self, location):
@@ -80,6 +91,8 @@ class SearchDriver(WebDriver):
 		self.goToMaps()
 		self.search_location(location)
 		self.get_basic_info()
+		self.get_location()
+		# time.sleep(50)
 
 		print(self.location_data)
 
