@@ -23,9 +23,7 @@ class SearchDriver(WebDriver):
 		self.location_data["address"] = "NA"
 		self.location_data["contact"] = "NA"
 		self.location_data["website"] = "NA"
-		# self.location_data["Time"] = {"Monday":"NA", "Tuesday":"NA", "Wednesday":"NA", "Thursday":"NA", "Friday":"NA", "Saturday":"NA", "Sunday":"NA"}
-		# self.location_data["Reviews"] = []
-		# self.location_data["Popular Times"] = {"Monday":[], "Tuesday":[], "Wednesday":[], "Thursday":[], "Friday":[], "Saturday":[], "Sunday":[]}     
+		self.location_data["reviews"] = []
 		
 	def search_location(self, location):
 		self.location_data["name"] = location
@@ -77,7 +75,7 @@ class SearchDriver(WebDriver):
 			xpath = '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[7]/div[7]/button/div/div[2]/div[1]'
 			# WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
 			plusCode = self.driver.find_element(By.XPATH, xpath)
-			print(plusCode.text)
+			# print(plusCode.text)
 			lat, long = getLatLongFromShortPlusCode(plusCode.text)
 			self.location_data["lat"] = lat
 			self.location_data["long"] = long
@@ -85,13 +83,85 @@ class SearchDriver(WebDriver):
 			print("Error in getting plus code for", self.location_data["name"])
 			return
 
+	def get_reviews(self):
+		xpath = '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[3]/div/div/button[2]'
+		reviewButton = self.driver.find_element(By.XPATH, xpath)
+		reviewButton.click()
+		time.sleep(5)
+  
+		compiled_reviews = []
+		set_of_reviews = set()
+		MAX_REVIEWS = 20
+		while True:
+			length = len(set_of_reviews)
+			reviews = self.driver.find_elements(By.CLASS_NAME, 'jftiEf')
+			for review in reviews:
+				# scroll into view
+				self.driver.execute_script("arguments[0].scrollIntoView();", review)
+				time.sleep(1)
+    
+				# get the reviewer name
+				try:
+					reviewer_name = review.find_element(By.CLASS_NAME, 'd4r55').text
+				except:
+					continue
+				# print(reviewer_name)
+    
+				# first click on the more button if any
+				try:
+					more_button = review.find_element(By.CLASS_NAME, 'w8nwRe')
+					more_button.click()
+				except:
+					pass
+ 
+ 				# get the review text
+				try:
+					review_text = review.find_element(By.CLASS_NAME, 'wiI7pd').text
+				except:
+					continue
+				# print(review_text)
+    
+				# get the images
+				# first click the more images button if any
+				try:
+					more_images_button = review.find_element(By.CLASS_NAME, 'Tap5If')
+					more_images_button.click()
+				except:
+					pass
+				
+				try:
+					images_list = list()
+					images = review.find_elements(By.CLASS_NAME, 'Tya61d')
+					for image in images:
+						style_att = image.get_attribute('style')
+						image_url = style_att.split('url("')[1].split('");')[0]
+						# print(image_url)
+						images_list.append(image_url)
+				except:
+					pass
+    
+				compiled_review = {'name': reviewer_name, 'comment': review_text, 'images': images_list}
+				compiled_reviews.append(compiled_review)
+				set_of_reviews.add(reviewer_name) # to avoid duplicates
+
+			if len(reviews) >= MAX_REVIEWS or length == len(set_of_reviews):
+				break
+			
+		# print("Total reviews:", len(compiled_reviews))
+		# print(compiled_reviews)
+		self.location_data["reviews"] = compiled_reviews
+  
+	def get_tags(self):
+		pass
 
 	def scrape(self, location):
-		self.setLangEnglish()
+		# self.setLangEnglish()
 		self.goToMaps()
 		self.search_location(location)
 		self.get_basic_info()
 		self.get_location()
+		self.get_reviews()
+		self.get_tags()
 		# time.sleep(50)
 
 		print(self.location_data)
