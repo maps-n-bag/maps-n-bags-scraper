@@ -20,6 +20,8 @@ class WebDriver:
     
   def goToMaps(self):
     self.driver.get("https://www.google.com/maps")
+  def goToMapsURL(self, url):
+    self.driver.get(url)
     
   def setLangEnglish(self):
     self.goToMaps()

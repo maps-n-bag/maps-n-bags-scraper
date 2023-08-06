@@ -18,29 +18,6 @@ class all_place(WebDriver):
         # submitButton.click()
         # time.sleep(20)
         time.sleep(20)
-        # try:
-        #     while True:
-        #         try:
-        #             places = self.driver.find_element(By.CLASS_NAME, 'hfpxzc')
-        #         except:
-        #             break
-        #         self.driver.execute_script("arguments[0].scrollIntoView();", places)
-        # # Scroll to the bottom of the page
-        # while True:
-        #     # Scroll down using Keys
-        #     self.driver.find_element(By.CLASS_NAME, "hfpxzc").send_keys(Keys.PAGE_DOWN)
-
-        #     # Check if you have reached the bottom of the page
-        #     # You can customize this condition based on your use case
-        #     if self.driver.execute_script("return window.scrollY + window.innerHeight >= document.body.scrollHeight"):
-        #         break
-        # while True:
-        #     # Scroll down using Keys
-        #     self.driver.find_element(By.CLASS_NAME, "hfpxzc").send_keys(Keys.PAGE_DOWN)
-
-        #     # Check if you have reached the bottom of the page
-        #     # You can customize this condition based on your use case
-        #     if self.driver.execute_script("return window.scrollY + window.innerHeight >= document.body.scrollHeight"):
         #         break
         set_of_places = set()
         bool = True

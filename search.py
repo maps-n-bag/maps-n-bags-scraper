@@ -167,7 +167,6 @@ class SearchDriver(WebDriver):
 		print(self.location_data)
 
 location = 'Bangabandhu Military Museum'
-# location = 'Headless Technologies Limited'
 d = SearchDriver()
 d.scrape(location)
 d.exit()
