@@ -7,6 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import time
+from db_connection.db_connection import db_connection
 
 from webdriver import WebDriver
 from plus_code_conv import getLatLongFromShortPlusCode
@@ -24,6 +25,8 @@ class SearchDriver(WebDriver):
 		self.location_data["contact"] = "NA"
 		self.location_data["website"] = "NA"
 		self.location_data["reviews"] = []
+		self.location_data["images"] ="NA"
+		self.location_data["description"] = "NA"
 		
 	def search_location(self, location):
 		self.location_data["name"] = location
@@ -63,7 +66,16 @@ class SearchDriver(WebDriver):
 			self.location_data["contact"] = phone_number.text
 		except:
 			print("Error in getting phone number for", self.location_data["name"])
-
+		try:
+			image=self.driver.find_element(By.XPATH,'/html/body/div[3]/div[8]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[1]/div[1]/button/img')
+			self.location_data["images"]=image.get_attribute('src')
+		except:
+			print("Error in getting image for", self.location_data["name"])
+		try: 
+			description=self.driver.find_element(By.CLASS_NAME,'DkEal')
+			self.location_data["description"]=description.text
+		except:
+			print("Error in getting description for", self.location_data["name"])
 		try:
 			website = self.driver.find_element(By.XPATH, '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[7]/div[5]/a/div/div[2]/div[1]')
 			self.location_data["website"] = website.text
@@ -155,7 +167,7 @@ class SearchDriver(WebDriver):
 		pass
 
 	def scrape(self, location):
-		# self.setLangEnglish()
+		self.setLangEnglish()
 		self.goToMaps()
 		self.search_location(location)
 		self.get_basic_info()
@@ -165,8 +177,7 @@ class SearchDriver(WebDriver):
 		# time.sleep(50)
 
 		print(self.location_data)
-
-location = 'Bangabandhu Military Museum'
-d = SearchDriver()
-d.scrape(location)
-d.exit()
+# location = "Lal Dighi (Pond)/ লাল দিঘী"
+# d = SearchDriver()
+# d.scrape(location)
+# d.exit()
