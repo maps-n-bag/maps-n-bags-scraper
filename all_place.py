@@ -5,7 +5,11 @@ from selenium.webdriver.common.keys import Keys
 from webdriver import WebDriver
 from search import SearchDriver
 import csv
-MAX=15
+MAX_PLACE=6
+from db_connection.db_connection import db_connection
+# from search import SearchDriver
+conn=db_connection()
+cur=conn.cursor()
 
 class all_place(WebDriver):
     def __init__(self):
@@ -16,7 +20,7 @@ class all_place(WebDriver):
         time.sleep(2)
         searchBox = self.driver.find_element(By.XPATH, '//*[@id="searchboxinput"]')
         searchBox.clear()
-        searchBox.send_keys('Tourists attraction in '+place +Keys.ENTER)
+        searchBox.send_keys('Things to do in '+place +Keys.ENTER)
         # submitButton = self.driver.find_element(By.XPATH, '//*[@id="searchbox-searchbutton"]')
         # submitButton.click()
         # time.sleep(20)
@@ -30,12 +34,12 @@ class all_place(WebDriver):
         while bool:
             time.sleep(5)
             lenth = len(set_of_places)
-            if(lenth>=MAX):
-                break
             places=self.driver.find_elements(By.CLASS_NAME, 'hfpxzc')
             ratings = self.driver.find_elements(By.CLASS_NAME, 'ZkP5Je')
             for place in places:
                 if place.get_attribute('aria-label') in set_of_places:
+                    continue
+                if(i>=len(ratings)):
                     continue
                 rating = ratings[i]
                 i+=1
@@ -45,7 +49,7 @@ class all_place(WebDriver):
                 print(rating_number)
                 if(rating_number>=10):
                     target_places.append(place)
-                if(len(target_places)>=MAX):
+                if(len(target_places)>=MAX_PLACE):
                     bool=False
                     break
                 self.driver.execute_script("arguments[0].scrollIntoView();", place)
@@ -62,7 +66,7 @@ class all_place(WebDriver):
         print(len(target_places))
         list_link={'name':[],'link':[]}
         for place in target_places:
-            if i==MAX:
+            if i==MAX_PLACE:
                 break
             # writer.writerow([place.get_attribute('aria-label'),place.get_attribute('href')])
             # click on the place
@@ -77,9 +81,47 @@ class all_place(WebDriver):
             d.get_basic_info()
             d.get_reviews()
             d.get_location()
+            query="""
+                INSERT INTO public.place(title, description, latitude, longitude, rating, address, contact, website, region_id,type) VALUES
+                (%s,%s,%s,%s,%s,%s,%s,%s,2,'spot')
+            """
+            try:
+                cur.execute(query,(d.location_data['name'],d.location_data['description'],d.location_data['lat'],d.location_data['long'],d.location_data['rating'],d.location_data['address'],d.location_data['contact'],d.location_data['website']))
+            except:
+                continue
+            conn.commit()
+            if d.location_data['images']!=None:
+                place_id=None
+                while place_id==None:
+                    cur.execute("SELECT last_value FROM public.place_id_seq")
+                    place_id=cur.fetchone()[0]
+                print(place_id)
+                query="""INSERT INTO public.place_image(place_id, link) VALUES (%s,%s)"""
+                cur.execute(query,(place_id,d.location_data['images']))
+                conn.commit()
+            for review in d.location_data['reviews']:
+                query="""
+                    INSERT INTO public.review(username, comment, place_id) VALUES 
+                    (%s,%s,%s)
+                """
+                cur.execute(query,(review['name'],review['comment'][:255],place_id))
+                conn.commit()
+                review_id=None
+                while review_id==None:
+                    cur.execute("SELECT last_value FROM public.review_id_seq")
+                    review_id=cur.fetchone()[0]
+                for image in review['images']:
+                    query="""
+                        INSERT INTO public.review_image(review_id, link) VALUES 
+                        (%s,%s)
+                    """
+                    cur.execute(query,(review_id,image))
+                    conn.commit()
             print(d.location_data)
-        return all_places
-place = 'Coxs Bazar'
+        
+place = 'Bandarban'
 d = all_place()
 d.get_all_Tourist_places(place)
+cur.close()
+conn.close()
 d.exit()

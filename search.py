@@ -19,14 +19,14 @@ class SearchDriver(WebDriver):
 	def __init__(self,driver):
 		# super().__init__()
 		self.driver=driver
-		self.location_data["rating"] = "NA"
-		self.location_data["reviews_count"] = "NA"
-		self.location_data["address"] = "NA"
-		self.location_data["contact"] = "NA"
-		self.location_data["website"] = "NA"
+		self.location_data["rating"] = ""
+		self.location_data["reviews_count"] = ""
+		self.location_data["address"] = ""
+		self.location_data["contact"] = ""
+		self.location_data["website"] = ""
 		self.location_data["reviews"] = []
-		self.location_data["images"] ="NA"
-		self.location_data["description"] = "NA"
+		self.location_data["images"] =""
+		self.location_data["description"] = ""
 		
 	def search_location(self, location):
 		self.location_data["name"] = location
@@ -57,7 +57,7 @@ class SearchDriver(WebDriver):
 			print("Error in getting reviews count for", self.location_data["name"])
 
 		try:
-			address = self.driver.find_element(By.XPATH, '/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[7]/div[3]/button/div/div[2]/div[1]')
+			address = self.driver.find_element(By.XPATH, '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[7]/div[3]/button/div/div[2]/div[1]')
 			self.location_data["address"] = address.text
 		except:
 			print("Error in getting address for", self.location_data["name"])
@@ -138,7 +138,11 @@ class SearchDriver(WebDriver):
 				try:
 					images_list = list()
 					images = review.find_elements(By.CLASS_NAME, 'Tya61d')
+					image_count=0
 					for image in images:
+						if(image_count>1):
+							break
+						image_count+=1
 						style_att = image.get_attribute('style')
 						image_url = style_att.split('url("')[1].split('");')[0]
 						# print(image_url)
