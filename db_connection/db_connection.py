@@ -5,11 +5,11 @@ set_env()
 def db_connection():
     try:
         conn=psycopg2.connect(
-                host=os.getenv('HOST'),
-                database=os.getenv('DBNAME'),
-                user=os.getenv('PGUSER'),
-                password=os.getenv('PGPASSWORD'),
-                port=os.getenv('PORT'))
+                host=os.getenv('DB_HOST'),
+                database=os.getenv('DB_NAME'),
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASS'),
+                port=os.getenv('DB_PORT'))
     except Exception as e:
         print(e)
     return conn

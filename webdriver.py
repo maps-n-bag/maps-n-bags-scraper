@@ -19,7 +19,7 @@ class WebDriver:
     self.driver = webdriver.Chrome(service=self.service, options=self.options)
     
   def goToMaps(self):
-    self.driver.get("https://www.google.com/maps")
+    self.driver.get("https://www.google.com/maps/place/Lal+Dighi+%28Pond%29%2F+%E0%A6%B2%E0%A6%BE%E0%A6%B2+%E0%A6%A6%E0%A6%BF%E0%A6%98%E0%A7%80/data=!4m7!3m6!1s0x30adc97e1ee2b41d:0x1b620a5b61d868fc!8m2!3d21.4440233!4d91.9748367!16s%2Fg%2F11rkcyp4wt!19sChIJHbTiHn7JrTAR_GjYYVsKYhs?authuser=0&hl=en&rclk=1")
   def goToMapsURL(self, url):
     self.driver.get(url)
     

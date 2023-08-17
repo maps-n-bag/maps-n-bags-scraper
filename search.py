@@ -16,9 +16,9 @@ class SearchDriver(WebDriver):
 
 	location_data = {}
 
-	def __init__(self):
-		super().__init__()
-
+	def __init__(self,driver):
+		# super().__init__()
+		self.driver=driver
 		self.location_data["rating"] = "NA"
 		self.location_data["reviews_count"] = "NA"
 		self.location_data["address"] = "NA"
@@ -37,6 +37,7 @@ class SearchDriver(WebDriver):
 		submitButton.click()
 
 	def get_basic_info(self):
+		# self.location_data["name"] = location
 		try:
 			WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div/div[1]/div[2]/div/div[1]/div[2]/span[1]/span[1]')))
 		except:
@@ -83,18 +84,10 @@ class SearchDriver(WebDriver):
 			print("Error in getting website for", self.location_data["name"])
    
 	def get_location(self):
-		try:
-			xpath = '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[7]/div[7]/button/div/div[2]/div[1]'
-			# WebDriverWait(self.driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
-			plusCode = self.driver.find_element(By.XPATH, xpath)
-			# print(plusCode.text)
-			lat, long = getLatLongFromShortPlusCode(plusCode.text)
-			self.location_data["lat"] = lat
-			self.location_data["long"] = long
-		except:
-			print("Error in getting plus code for", self.location_data["name"])
-			return
-
+		url=self.driver.current_url
+		self.location_data['lat']=float(url.split('@')[1].split(',')[0])
+		self.location_data['long']=float(url.split('@')[1].split(',')[1].split(',')[0]
+)
 	def get_reviews(self):
 		xpath = '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[3]/div/div/button[2]'
 		reviewButton = self.driver.find_element(By.XPATH, xpath)
@@ -103,8 +96,9 @@ class SearchDriver(WebDriver):
   
 		compiled_reviews = []
 		set_of_reviews = set()
-		MAX_REVIEWS = 20
-		while True:
+		MAX_REVIEWS = 3
+		bool_val=True
+		while bool_val:
 			length = len(set_of_reviews)
 			reviews = self.driver.find_elements(By.CLASS_NAME, 'jftiEf')
 			for review in reviews:
@@ -154,10 +148,12 @@ class SearchDriver(WebDriver):
     
 				compiled_review = {'name': reviewer_name, 'comment': review_text, 'images': images_list}
 				compiled_reviews.append(compiled_review)
+				if len(compiled_reviews) >= MAX_REVIEWS or length == len(set_of_reviews):
+					bool_val=False
+					break
 				set_of_reviews.add(reviewer_name) # to avoid duplicates
 
-			if len(reviews) >= MAX_REVIEWS or length == len(set_of_reviews):
-				break
+			
 			
 		# print("Total reviews:", len(compiled_reviews))
 		# print(compiled_reviews)
@@ -169,7 +165,7 @@ class SearchDriver(WebDriver):
 	def scrape(self, location):
 		self.setLangEnglish()
 		self.goToMaps()
-		self.search_location(location)
+		# self.search_location(location)
 		self.get_basic_info()
 		self.get_location()
 		self.get_reviews()
