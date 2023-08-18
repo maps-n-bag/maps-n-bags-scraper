@@ -101,6 +101,8 @@ class SearchDriver(WebDriver):
 		while bool_val:
 			length = len(set_of_reviews)
 			reviews = self.driver.find_elements(By.CLASS_NAME, 'jftiEf')
+			if len(reviews) == 0:
+				break
 			for review in reviews:
 				# scroll into view
 				self.driver.execute_script("arguments[0].scrollIntoView();", review)

@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from webdriver import WebDriver
 from search import SearchDriver
 import csv
-MAX_PLACE=6
+MAX_PLACE=30
 from db_connection.db_connection import db_connection
 # from search import SearchDriver
 conn=db_connection()
@@ -20,7 +20,7 @@ class all_place(WebDriver):
         time.sleep(2)
         searchBox = self.driver.find_element(By.XPATH, '//*[@id="searchboxinput"]')
         searchBox.clear()
-        searchBox.send_keys('Things to do in '+place +Keys.ENTER)
+        searchBox.send_keys('Restaurants in  '+place +Keys.ENTER)
         # submitButton = self.driver.find_element(By.XPATH, '//*[@id="searchbox-searchbutton"]')
         # submitButton.click()
         # time.sleep(20)
@@ -82,11 +82,11 @@ class all_place(WebDriver):
             d.get_reviews()
             d.get_location()
             query="""
-                INSERT INTO public.place(title, description, latitude, longitude, rating, address, contact, website, region_id,type) VALUES
-                (%s,%s,%s,%s,%s,%s,%s,%s,2,'spot')
+                INSERT INTO public.place(title, description, latitude, longitude, rating, address, contact, website, region_id,type,rating_count) VALUES
+                (%s,%s,%s,%s,%s,%s,%s,%s,2,'restaurant',%s)
             """
             try:
-                cur.execute(query,(d.location_data['name'],d.location_data['description'],d.location_data['lat'],d.location_data['long'],d.location_data['rating'],d.location_data['address'],d.location_data['contact'],d.location_data['website']))
+                cur.execute(query,(d.location_data['name'],d.location_data['description'],d.location_data['lat'],d.location_data['long'],d.location_data['rating'],d.location_data['address'],d.location_data['contact'],d.location_data['website'],d.location_data['reviews_count'].replace(',','')))
             except:
                 continue
             conn.commit()
