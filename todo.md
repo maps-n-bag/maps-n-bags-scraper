@@ -1,0 +1,4 @@
+- [x] reviews
+- [ ] tags
+- [x] review images
+- [ ] usual images
